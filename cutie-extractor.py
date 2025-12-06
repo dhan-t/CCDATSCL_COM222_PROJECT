@@ -1,6 +1,6 @@
 """
-Strava Data Extractor GUI
-Interactive GUI for extracting Strava activities with date range selection,
+Cutie Extractor GUI
+Interactive GUI for extracting activities with date range selection,
 data preview, and CSV export to Downloads folder.
 """
 
@@ -56,7 +56,7 @@ STRAVA_API_URL = "https://www.strava.com/api/v3"
 
 
 class StravaExtractor:
-    """Extracts activity data from Strava API within a date range."""
+    """Extracts activity data from the API within a date range."""
 
     def __init__(self, access_token: str):
         self.access_token = access_token
@@ -72,7 +72,7 @@ class StravaExtractor:
         per_page: int = 200,
         max_activities: Optional[int] = None,
     ) -> List[Dict]:
-        """Fetch activities from Strava within a date range."""
+        """Fetch activities from the API within a date range."""
         activities = []
         page = 1
         per_page = min(per_page, 200)
@@ -121,7 +121,7 @@ class StravaExtractor:
         return activities
 
     def extract_activity_data(self, activity: Dict) -> Dict:
-        """Extract specified fields from a Strava activity in chronological order per API docs."""
+        """Extract specified fields from an activity in chronological order per API docs."""
         # Convert m/s to km/h: multiply by 3.6
         avg_speed_kmh = activity.get("average_speed", 0)
         max_speed_kmh = activity.get("max_speed", 0)
@@ -169,11 +169,11 @@ class StravaExtractor:
 
 
 class StravaGUI:
-    """Tkinter GUI for Strava Data Extractor"""
+    """Tkinter GUI for Cutie Extractor"""
 
     def __init__(self, root):
         self.root = root
-        self.root.title("Strava Data Extractor")
+        self.root.title("Cutie Extractor")
         self.root.geometry("900x700")
         self.root.configure(bg="#f0f0f0")
 
@@ -505,7 +505,7 @@ class StravaGUI:
         if activities is None:
             # Auth problem
             self.terminal.config(state=tk.NORMAL)
-            self.terminal.insert(tk.END, "\nAuth Error: Check your Strava access token.\n")
+            self.terminal.insert(tk.END, "\nAuth Error: Check your access token.\n")
             self.terminal.config(state=tk.DISABLED)
             self.activities = []
             return
