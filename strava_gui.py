@@ -18,6 +18,38 @@ import threading
 # Load environment variables
 load_dotenv()
 
+# Small terminal-style ASCII art used in the left panel
+ASCII_ART =  """cutie-extractor@nitro⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣨⠤⠤⠶⠤⢂⠤⠤⠤⠤⠴⠄⡤⢤⠤⡤⣤⠄⢀⢀⣀⣀⣀⣀⣀⠀⠀⠀
+⠀⠀⠀⠀⠀⣠⠴⢊⠥⢢⠌⡡⢆⠱⠌⡄⢣⠒⡌⢢⠑⡰⢂⠥⡙⠤⣭⡤⠌⠓⠊⠉⠁⠀⠀⠀⠀
+⠀⠀⠀⣠⠞⡡⢘⡈⠜⡠⢊⠔⡨⢁⠎⣀⠣⡁⠜⡠⢉⠔⡡⣧⠘⣠⣁⠮⠒⠀⡀⠀⠀⠀⠀⠀⠀
+⠀⢀⠞⣡⢈⠑⠢⢉⠆⡱⠈⢆⠡⠅⡊⠤⢑⡈⢱⠠⠭⠆⠑⠛⠈⠁⠀⠀⠀⠀⠈⠱⡄⠀⠀⠀⠀
+⢀⡞⣡⢣⠥⣾⠷⠼⢆⡅⢈⣀⣈⣀⣀⣀⣀⣀⣸⣀⣀⣀⠀⣎⣀⣤⠤⠤⠤⠤⠄⣀⡈⢆⠀⠀⠀
+⢰⢄⢧⠣⣼⠃⢆⢒⡾⢐⠢⣐⣴⣾⡟⡙⢢⡴⡏⡔⠤⢂⢜⣧⠡⣌⠳⡝⣎⠧⢻⡔⢂⠜⣧⠀⠀
+⡎⣌⢉⢲⠏⣌⡐⡾⡄⢃⠆⣭⣟⣿⠁⢬⡜⠀⡧⡌⢢⠁⡞⠈⠳⣄⠥⢂⢹⡔⡈⢏⠑⠪⣌⢇⠀
+⡏⠤⡈⣟⡈⠤⢸⠇⡌⢡⢺⡿⣯⠏⣨⠞⠀⠀⡏⠤⣁⣹⠁⠀⠀⠙⣎⠡⠌⣷⢁⠚⡄⠀⠈⠙⢆
+⡏⠆⣩⡇⢌⠡⣿⠉⡌⢢⣿⢿⣻⢨⡝⠀⠀⠀⡏⠒⢤⠃⠀⠀⠀⠀⠈⢷⠨⢽⣎⠡⢇⠀⠀⠀⠈
+⣏⠒⣼⠘⠤⣳⣯⠰⢡⣿⣻⠃⣇⠏⠀⠀⠀⠀⣏⢱⠏⠀⠀⢀⣀⣰⣆⣸⣧⢼⣿⡌⢺⠀⠀⠀⠀
+⢹⡂⣹⠔⣰⣿⣯⡀⢮⣿⣿⠀⣿⣤⣄⣠⣶⡀⢯⡞⠀⠀⠀⢼⣿⣿⣿⣿⢿⣾⣿⣅⢺⠀⠀⠀⠀
+⠸⡇⢸⣯⡟⠁⡷⡈⣾⣿⣻⣿⣿⣿⠿⠿⠿⠃⠘⠀⠀⠀⠀⠈⠁⠀⠀⢻⣿⡿⣳⣯⢹⠀⠀⠀⠀
+⠈⣿⢘⠃⢧⠀⡷⢰⣿⢿⣟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠇⠹⣾⡏⠀⠀⠀⠀
+⠀⠘⡆⡿⢸⣷⣾⣸⣿⣻⣿⡇⠀⠀⠀⠀⠀⠀⠐⠤⠤⠤⠂⠀⠀⣀⣴⢻⡾⠀⠀⢻⡇⠀⠀⠀⠀
+⠀⠀⢸⡗⣸⣷⣻⣾⣷⢯⣿⣹⣤⣤⣀⡀⠀⢀⡀⢀⡀⣀⣤⣴⣿⣻⣿⠘⠁⠀⠀⠀⠁⠀⠀⠀⠀
+⠀⠀⠀⡧⣸⣷⣻⣿⣞⡟⡈⣿⣿⣾⣿⠀⠉⠈⢹⣿⣿⣽⢾⣽⡾⣽⣹⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡗⣸⣷⢿⣾⣿⡠⢁⠺⣿⣟⣯⠀⢈⠀⢈⢻⣿⣽⣾⣽⡷⣟⣸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡏⢾⣿⢹⣿⣾⣷⢈⠂⢿⡿⣿⢷⠚⠒⠒⢾⡿⣷⣻⢿⡽⢇⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⢸⢡⣻⡏⢼⣿⣖⣭⣧⠚⠌⣿⢷⢯⣧⠀⠀⠠⣿⡟⣵⢟⡟⣼⡙⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣸⢰⡏⡐⡞⠀⠈⠘⠫⢷⣌⠸⣶⣌⡛⢧⡀⠀⣷⣻⣻⣾⣱⡿⢯⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢠⡇⢢⡄⢹⠀⠀⠀⠀⠀⠀⠙⣶⣽⣮⠙⣷⣵⠀⠛⣽⣿⣽⡟⠁⠈⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢰⠌⢆⢉⡇⠀⠀⠀⠀⠀⠀⠀⠱⡙⠻⣿⣪⣙⠧⣸⢏⣽⠟⣽⠄⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠯⡐⢎⢸⠆⠀⠀⠀⠀⠀⠀⠀⠀⠳⡡⠔⡉⠿⣽⣿⡿⠋⣄⣿⠂⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⢨⠇⠌⠆⣞⠀⠀⠀⠀⠀⠀⠈⡄⠀⠀⠉⠉⠉⠉⡸⢩⡝⣅⠀⠠⠄⠀⠀⢰⠀⠀⠀⠀⠀⠀⠀⠀
+⡼⢈⠌⡑⣾⠀⠀⠀⠀⠀⠀⠀⣃⠇⠀⠀⠀⢀⡜⠤⢹⡋⢤⠣⣀⠃⠀⠀⠘⠀⠀⠀⠀⠀⠀⠀⠀
+⠓⠚⠒⠓⠋⠀⠀⠀⠀⠀⠀⠀⠛⠀⠀⠀⠀⠋⠒⠚⠙⠓⠂⠓⠚⠃⠀⠀⠀⠃⠀⠀⠀⠀⠀⠀⠀"""
+
+# Accent color used in the terminal UI
+COLOR = "#FC5200"
+
 STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
 STRAVA_ACCESS_TOKEN = os.getenv("STRAVA_ACCESS_TOKEN")
 STRAVA_API_URL = "https://www.strava.com/api/v3"
@@ -158,315 +190,477 @@ class StravaGUI:
         self.setup_ui()
 
     def setup_ui(self):
-        """Setup the GUI components."""
-        # Title
-        title_frame = ttk.Frame(self.root)
-        title_frame.pack(fill="x", padx=20, pady=20)
+        """Setup the GUI components in a terminal-inspired layout.
 
-        title = ttk.Label(
-            title_frame, text="🏃 Strava Data Extractor", font=("Arial", 18, "bold")
+        Left: ASCII art (50%). Right: terminal-style control area with
+        arrow-key navigation for quick select options.
+        """
+        # Main split: left ASCII art, right terminal area
+        main_frame = tk.Frame(self.root, bg="#000000")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        left_frame = tk.Frame(main_frame, bg="#000000", width=300)
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False, padx=10, pady=10)
+        left_frame.pack_propagate(False)
+
+        art_label = tk.Label(
+            left_frame,
+            text=ASCII_ART,
+            fg="#ffffff",
+            bg="#000000",
+            font=("Courier New", 8),
+            justify=tk.LEFT,
+            anchor="nw"
         )
-        title.pack()
+        art_label.pack(side=tk.TOP, anchor="nw")
 
-        # Date Selection Frame
-        date_frame = ttk.LabelFrame(self.root, text="📅 Select Date Range", padding=15)
-        date_frame.pack(fill="x", padx=20, pady=10)
-
-        # Quick Select Buttons
-        quick_frame = ttk.Frame(date_frame)
-        quick_frame.pack(fill="x", pady=10)
-
-        ttk.Label(quick_frame, text="Quick Select:", font=("Arial", 10, "bold")).pack(
-            side="left", padx=5
+        # Right side: Terminal output and input
+        right_frame = tk.Frame(main_frame, bg="#000000")
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Output text widget (plain Text without scrollbar)
+        self.terminal = tk.Text(
+            right_frame,
+            bg="#000000",
+            fg="#ffffff",
+            insertbackground="#ffffff",
+            font=("Courier New", 9),
+            wrap=tk.WORD,
+            relief=tk.FLAT,
+            borderwidth=0,
+            state=tk.DISABLED
         )
+        self.terminal.pack(fill=tk.BOTH, expand=True)
+        
+        # Style tags
+        self.terminal.tag_config("title", foreground=COLOR, font=("Courier New", 11, "bold"))
+        self.terminal.tag_config("COLOR_bold", foreground=COLOR, font=("Courier New", 11, "bold"))
+        self.terminal.tag_config("choice", foreground=COLOR, font=("Courier New", 11, "bold"))
+        # Tags for showcase
+        self.terminal.tag_config("sh_header", foreground=COLOR, font=("Courier New", 10, "bold"))
+        self.terminal.tag_config("sh_desc", foreground="#ffffff", font=("Courier New", 10))
+        self.terminal.tag_config("sh_right", justify=tk.RIGHT)
+        self.terminal.tag_config("sh_select", background="#222222", foreground=COLOR, font=("Courier New", 10, "bold"))
 
-        ttk.Button(
-            quick_frame, text="Last 7 Days", command=self.set_last7_days
-        ).pack(side="left", padx=5)
+        # Quick select options (order follows user's request)
+        # "This Week" omitted as requested (redundant)
+        self.quick_options = [
+            ("Last 7 Days", lambda: self.select_days(7)),
+            ("This Month", self.set_this_month),
+            ("All Time", self.select_all_time),
+            ("Custom", self.prompt_custom_days),
+        ]
 
-        ttk.Button(
-            quick_frame, text="This Week", command=self.set_this_week
-        ).pack(side="left", padx=5)
+        self.selected_option = 0
+        self.custom_days_value = None
+        # preview mode state
+        self.preview_mode = False
+        self.preview_choice = 0  # 0: Export, 1: Back
+        self.preview_start = None
+        self.preview_end = None
+        self.preview_activities = []
+        self.root.resizable(False, False)
+        self.root.minsize(600, 400)
+        self.root.maxsize(600, 400)
+        
+        # Render menu
+        self.render_menu()
 
-        ttk.Button(
-            quick_frame, text="This Month", command=self.set_this_month
-        ).pack(side="left", padx=5)
+        # Bind arrow keys and Enter
+        self.root.bind("<Up>", self.on_up)
+        self.root.bind("<Down>", self.on_down)
+        self.root.bind("<Return>", self.on_enter)
 
-        # Date Range Display
-        display_frame = ttk.Frame(date_frame)
-        display_frame.pack(fill="x", pady=10)
+        # Loading overlay placeholder
+        self.loading_win = None
 
-        ttk.Label(display_frame, text="Start Date:", font=("Arial", 10)).pack(
-            side="left", padx=5
-        )
-        self.start_date_var = tk.StringVar(
-            value=(datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-        )
-        ttk.Entry(display_frame, textvariable=self.start_date_var, width=15).pack(
-            side="left", padx=5
-        )
+        # Preview window reference
+        self.preview_win = None
 
-        ttk.Label(display_frame, text="End Date:", font=("Arial", 10)).pack(
-            side="left", padx=20
-        )
-        self.end_date_var = tk.StringVar(value=datetime.now().strftime("%Y-%m-%d"))
-        ttk.Entry(display_frame, textvariable=self.end_date_var, width=15).pack(
-            side="left", padx=5
-        )
+    # ------------------ Menu & Interaction Helpers ------------------
+    def render_menu(self):
+        """Render the quick-select menu in the terminal area."""
+        self.terminal.config(state=tk.NORMAL)
+        self.terminal.delete("1.0", tk.END)
+        self.terminal.insert(tk.END, "Use ")
+        self.terminal.insert(tk.END, "arrow keys", "COLOR_bold")
+        self.terminal.insert(tk.END, " to select, then press ")
+        self.terminal.insert(tk.END, "Enter", "COLOR_bold")
+        self.terminal.insert(tk.END, "\n\n")
 
-        # Slider Frame for Visual Range Selection
-        slider_frame = ttk.Frame(date_frame)
-        slider_frame.pack(fill="x", pady=15)
+        for i, (label, _) in enumerate(self.quick_options):
+            if i == self.selected_option:
+                # Highlight selected choice
+                prefix = "►"
+                tag = "choice"
+            else:
+                # Unselected: white text
+                prefix = " "
+                tag = "sh_desc"
+            line = f" {prefix} {label}\n"
+            self.terminal.insert(tk.END, line, tag)
 
-        ttk.Label(slider_frame, text="Adjust Range (Days Back):", font=("Arial", 10)).pack(
-            anchor="w"
-        )
+        self.terminal.insert(tk.END, "\n")
+        self.terminal.config(state=tk.DISABLED)
 
-        slider_subframe = ttk.Frame(slider_frame)
-        slider_subframe.pack(fill="x", pady=5)
+    def update_menu_cursor(self):
+        """Update the visible cursor arrow for the menu."""
+        # Re-render menu to simplify cursor handling
+        self.render_menu()
 
-        ttk.Label(slider_subframe, text="Days:", font=("Arial", 9)).pack(side="left")
-        self.days_var = tk.IntVar(value=7)
-        days_slider = ttk.Scale(
-            slider_subframe,
-            from_=1,
-            to=90,
-            orient="horizontal",
-            variable=self.days_var,
-            command=self.update_dates_from_slider,
-        )
-        days_slider.pack(side="left", fill="x", expand=True, padx=10)
-        self.days_label = ttk.Label(slider_subframe, text="7 days", width=10)
-        self.days_label.pack(side="left")
+    def on_up(self, event):
+        """Navigate up in the menu."""
+        if self.preview_mode:
+            if self.preview_choice > 0:
+                self.preview_choice -= 1
+            # Re-render the entire preview table (like main menu)
+            self._render_preview_table(self.preview_activities, self.preview_start, self.preview_end)
+        else:
+            if self.selected_option > 0:
+                self.selected_option -= 1
+                self.update_menu_cursor()
+        return "break"
 
-        # Fetch Button
-        fetch_button_frame = ttk.Frame(self.root)
-        fetch_button_frame.pack(fill="x", padx=20, pady=10)
+    def on_down(self, event):
+        """Navigate down in the menu."""
+        if self.preview_mode:
+            if self.preview_choice < 1:
+                self.preview_choice += 1
+            # Re-render the entire preview table (like main menu)
+            self._render_preview_table(self.preview_activities, self.preview_start, self.preview_end)
+        else:
+            if self.selected_option < len(self.quick_options) - 1:
+                self.selected_option += 1
+                self.update_menu_cursor()
+        return "break"
 
-        self.fetch_button = ttk.Button(
-            fetch_button_frame, text="🔍 Fetch Activities", command=self.fetch_activities
-        )
-        self.fetch_button.pack(side="left", padx=5)
+    def on_enter(self, event):
+        """Handle Enter on selected menu item."""
+        if self.preview_mode:
+            # preview choices: 0=Export CSV, 1=Back
+            if self.preview_choice == 0:
+                # Export
+                try:
+                    self.export_preview_csv(self.preview_activities, self.preview_start, self.preview_end)
+                except Exception as e:
+                    print("Export error:", e)
+            else:
+                # Back to main menu
+                self.preview_mode = False
+                self.preview_choice = 0
+                self.render_menu()
+            return "break"
 
-        self.status_label = ttk.Label(
-            fetch_button_frame, text="Ready", foreground="green"
-        )
-        self.status_label.pack(side="left", padx=10)
+        label, action = self.quick_options[self.selected_option]
+        # If action is callable handler that will manage further flow
+        try:
+            action()
+        except TypeError:
+            # action might be a lambda that needs no args
+            action()
+        return "break"
 
-        # Data Preview Frame
-        preview_frame = ttk.LabelFrame(self.root, text="📊 Data Preview (Head)", padding=15)
-        preview_frame.pack(fill="both", expand=True, padx=20, pady=10)
-
-        # Scrolled Text Widget for Preview
-        self.preview_text = scrolledtext.ScrolledText(
-            preview_frame, height=15, width=80, font=("Courier", 9)
-        )
-        self.preview_text.pack(fill="both", expand=True)
-        self.preview_text.insert("1.0", "No data fetched yet. Click 'Fetch Activities' to start.")
-        self.preview_text.config(state="disabled")
-
-        # Export Button Frame
-        export_frame = ttk.Frame(self.root)
-        export_frame.pack(fill="x", padx=20, pady=15)
-
-        self.export_button = ttk.Button(
-            export_frame, text="💾 Export to CSV (Downloads)", command=self.export_csv
-        )
-        self.export_button.pack(side="left", padx=5)
-        self.export_button.config(state="disabled")
-
-        ttk.Label(export_frame, text="", font=("Arial", 9)).pack(side="left", padx=10)
-        self.export_status_label = ttk.Label(export_frame, text="", foreground="blue")
-        self.export_status_label.pack(side="left")
-
-    def set_last7_days(self):
-        """Set date range to last 7 days."""
+    def select_days(self, days: int):
+        """Common path for fixed-day selections."""
         end = datetime.now()
-        start = end - timedelta(days=7)
-        self.start_date_var.set(start.strftime("%Y-%m-%d"))
-        self.end_date_var.set(end.strftime("%Y-%m-%d"))
-        self.days_var.set(7)
+        start = end - timedelta(days=days)
+        # show loading and then fetch/preview
+        self.show_loading()
+        threading.Thread(target=self._fetch_activities_thread_range, args=(start, end), daemon=True).start()
 
     def set_this_week(self):
-        """Set date range to this week (Mon-Sun)."""
         today = datetime.now()
         start = today - timedelta(days=today.weekday())
         end = today
-        self.start_date_var.set(start.strftime("%Y-%m-%d"))
-        self.end_date_var.set(end.strftime("%Y-%m-%d"))
+        self.show_loading()
+        threading.Thread(target=self.fetch_and_preview, args=(start, end), daemon=True).start()
 
     def set_this_month(self):
-        """Set date range to this month."""
-        today = datetime.now()
-        start = today.replace(day=1)
-        self.start_date_var.set(start.strftime("%Y-%m-%d"))
-        self.end_date_var.set(today.strftime("%Y-%m-%d"))
-
-    def update_dates_from_slider(self, value):
-        """Update date range based on slider value."""
-        days = int(float(value))
-        self.days_label.config(text=f"{days} days")
+        # Use a 30-day window from now for "This Month" to match expected behaviour
         end = datetime.now()
-        start = end - timedelta(days=days)
-        self.start_date_var.set(start.strftime("%Y-%m-%d"))
-        self.end_date_var.set(end.strftime("%Y-%m-%d"))
+        start = end - timedelta(days=30)
+        self.show_loading()
+        threading.Thread(target=self._fetch_activities_thread_range, args=(start, end), daemon=True).start()
 
-    def fetch_activities(self):
-        """Fetch activities in a separate thread."""
-        self.fetch_button.config(state="disabled")
-        self.export_button.config(state="disabled")
-        self.status_label.config(text="⏳ Fetching...", foreground="orange")
-        self.root.update()
+    def select_all_time(self):
+        # Use a practical 'all time' window (last 10 years) to avoid huge queries
+        start = datetime.now() - timedelta(days=3650)
+        end = datetime.now()
+        self.show_loading()
+        threading.Thread(target=self._fetch_activities_thread_range, args=(start, end), daemon=True).start()
 
-        thread = threading.Thread(target=self._fetch_activities_thread)
-        thread.daemon = True
-        thread.start()
+    def prompt_custom_days(self):
+        """Prompt user for integer days back using terminal-style input."""
+        self.terminal.config(state=tk.NORMAL)
+        self.terminal.insert(tk.END, "\nEnter number of days back (integer): ", "COLOR_bold")
+        self.terminal.insert(tk.END, "")
+        self.terminal.config(state=tk.DISABLED)
 
-    def _fetch_activities_thread(self):
-        """Fetch activities (runs in background thread)."""
-        try:
-            start_date = datetime.strptime(self.start_date_var.get(), "%Y-%m-%d")
-            end_date = datetime.strptime(self.end_date_var.get(), "%Y-%m-%d")
+        # bind simple numeric input
+        self.custom_input = ""
+        self.root.bind('<Key>', self._on_custom_key)
 
-            if start_date > end_date:
-                self.root.after(
-                    0,
-                    lambda: messagebox.showerror(
-                        "Error", "Start date must be before end date"
-                    ),
-                )
-                self.fetch_button.config(state="normal")
-                self.status_label.config(text="Error", foreground="red")
+    def _on_custom_key(self, event):
+        if event.keysym == 'Return':
+            try:
+                days = int(self.custom_input.strip())
+            except Exception:
+                # invalid
+                self.terminal.config(state=tk.NORMAL)
+                self.terminal.insert(tk.END, "\nInvalid number. Cancelling.\n")
+                self.terminal.config(state=tk.DISABLED)
+                self.root.unbind('<Key>')
+                self.render_menu()
                 return
+            self.root.unbind('<Key>')
+            end = datetime.now()
+            start = end - timedelta(days=days)
+            self.show_loading()
+            threading.Thread(target=self._fetch_activities_thread_range, args=(start, end), daemon=True).start()
+        elif event.keysym == 'BackSpace':
+            if self.custom_input:
+                self.custom_input = self.custom_input[:-1]
+                self.terminal.config(state=tk.NORMAL)
+                # remove last char from the widget
+                self.terminal.delete("end-2c", tk.END)
+                self.terminal.config(state=tk.DISABLED)
+        else:
+            ch = event.char
+            if ch.isdigit():
+                self.custom_input += ch
+                self.terminal.config(state=tk.NORMAL)
+                self.terminal.insert(tk.END, ch)
+                self.terminal.config(state=tk.DISABLED)
 
-            # Fetch activities
-            activities = self.extractor.get_activities(start_date, end_date)
+    # ------------------ Loading & Fetching ------------------
+    def show_loading(self):
+        """Show a small terminal-style circular loading animation in a popup."""
+        if self.loading_win:
+            return
+        self.loading_win = tk.Toplevel(self.root)
+        self.loading_win.overrideredirect(True)
+        self.loading_win.configure(bg="#000000")
+        w, h = 300, 200
+        x = self.root.winfo_rootx() + int((self.root.winfo_width() - w) / 2)
+        y = self.root.winfo_rooty() + int((self.root.winfo_height() - h) / 2)
+        self.loading_win.geometry(f"{w}x{h}+{x}+{y}")
 
-            if activities is None:
-                self.root.after(
-                    0,
-                    lambda: messagebox.showerror(
-                        "Auth Error", "Check your Strava access token"
-                    ),
-                )
-                self.activities = []
-            elif activities:
-                self.activities = activities
-                self.root.after(0, self._display_preview)
-            else:
-                self.root.after(
-                    0,
-                    lambda: messagebox.showinfo(
-                        "No Data", "No activities found in this date range"
-                    ),
-                )
-                self.activities = []
+        canvas = tk.Canvas(self.loading_win, width=300, height=200, bg="#000000", highlightthickness=0)
+        canvas.pack()
+        text = canvas.create_text(150, 70, text="Fetching activities...", fill="#FFD300", font=("Courier New", 12, "bold"))
+        arc = canvas.create_arc(100, 90, 200, 190, start=0, extent=90, style=tk.ARC, outline=COLOR, width=4)
 
-        except ValueError:
-            self.root.after(
-                0,
-                lambda: messagebox.showerror(
-                    "Error", "Invalid date format. Use YYYY-MM-DD"
-                ),
-            )
+        def rotate(angle=0):
+            try:
+                canvas.delete(arc)
+            except Exception:
+                pass
+            a = canvas.create_arc(100, 90, 200, 190, start=angle, extent=90, style=tk.ARC, outline=COLOR, width=4)
+            self.loading_win.after(100, lambda: rotate((angle + 30) % 360))
+
+        rotate()
+
+    def hide_loading(self):
+        if self.loading_win:
+            try:
+                self.loading_win.destroy()
+            except Exception:
+                pass
+            self.loading_win = None
+
+    def fetch_and_preview(self, start_date: datetime, end_date: datetime):
+        """Fetch activities and then show preview window. Runs in background thread."""
+        try:
+            activities = self.extractor.get_activities(start_date, end_date, per_page=200)
+        except Exception as e:
+            activities = []
+            print("Fetch error:", e)
+
+        # Hide loading and show preview in main thread
+        self.root.after(0, lambda: self.hide_loading())
+        self.root.after(0, lambda: self.show_preview_window(activities, start_date, end_date))
+
+    def _fetch_activities_thread_range(self, start_date: datetime, end_date: datetime):
+        """Legacy-style fetch thread: logs params, fetches activities and routes results to handler."""
+        try:
+            after = int(start_date.timestamp())
+            before = int(end_date.timestamp())
+            print("Fetching activities with params:", {"after": after, "before": before, "per_page": 200})
+            activities = self.extractor.get_activities(start_date, end_date, per_page=200)
+        except Exception as e:
+            activities = []
+            print("Fetch error:", e)
+
+        # Handle results on main thread
+        self.root.after(0, lambda: self._handle_fetch_result(activities, start_date, end_date))
+
+    def _handle_fetch_result(self, activities, start_date, end_date):
+        """Update terminal UI and show preview using legacy logic style."""
+        # Always hide loading overlay
+        try:
+            self.hide_loading()
+        except Exception:
+            pass
+
+        if activities is None:
+            # Auth problem
+            self.terminal.config(state=tk.NORMAL)
+            self.terminal.insert(tk.END, "\nAuth Error: Check your Strava access token.\n")
+            self.terminal.config(state=tk.DISABLED)
             self.activities = []
-
-        finally:
-            self.root.after(0, self._update_ui_after_fetch)
-
-    def _display_preview(self):
-        """Display preview of fetched data."""
-        self.preview_text.config(state="normal")
-        self.preview_text.delete("1.0", "end")
-
-        if not self.activities:
-            self.preview_text.insert("1.0", "No activities to display.")
-            self.preview_text.config(state="disabled")
             return
 
-        # Create table header
-        sample_activity = self.extractor.extract_activity_data(self.activities[0])
-        headers = list(sample_activity.keys())
-
-        # Calculate column widths
-        col_widths = {h: len(h) + 2 for h in headers}
-        for activity in self.activities[:10]:
-            extracted = self.extractor.extract_activity_data(activity)
-            for key, value in extracted.items():
-                col_widths[key] = max(col_widths[key], len(str(value)) + 2)
-
-        # Display header
-        header_line = " | ".join(
-            h.ljust(col_widths[h]) for h in headers
-        )
-        self.preview_text.insert("end", header_line + "\n")
-        self.preview_text.insert("end", "-" * len(header_line) + "\n")
-
-        # Display first 10 rows
-        display_count = min(10, len(self.activities))
-        for i, activity in enumerate(self.activities[:display_count]):
-            extracted = self.extractor.extract_activity_data(activity)
-            row = " | ".join(
-                str(extracted.get(h, "")).ljust(col_widths[h]) for h in headers
-            )
-            self.preview_text.insert("end", row + "\n")
-
-        # Add summary
-        self.preview_text.insert("end", "\n" + "=" * 80 + "\n")
-        self.preview_text.insert(
-            "end",
-            f"Total activities fetched: {len(self.activities)}\n",
-        )
-        self.preview_text.insert(
-            "end",
-            f"Showing first {display_count} activities\n",
-        )
-
-        self.preview_text.config(state="disabled")
-
-    def _update_ui_after_fetch(self):
-        """Update UI after fetch completes."""
-        self.fetch_button.config(state="normal")
-
-        if self.activities:
-            self.export_button.config(state="normal")
-            self.status_label.config(
-                text=f"✅ {len(self.activities)} activities fetched",
-                foreground="green",
-            )
+        if activities:
+            self.activities = activities
+            # Render preview in main terminal (no popup)
+            self.preview_mode = True
+            self.preview_choice = 0
+            self.preview_start = start_date
+            self.preview_end = end_date
+            self.preview_activities = activities
+            self._render_preview_table(activities, start_date, end_date)
         else:
-            self.export_button.config(state="disabled")
-            self.status_label.config(text="❌ Failed or no data", foreground="red")
+            self.activities = []
+            self.terminal.config(state=tk.NORMAL)
+            self.terminal.insert(tk.END, "\nNo activities found for the selected range.\n")
+            self.terminal.config(state=tk.DISABLED)
 
-    def export_csv(self):
-        """Export data to CSV in Downloads folder."""
-        if not self.activities:
+    def _render_preview_table(self, activities, start_date, end_date):
+        """Render preview table in terminal with headers and column descriptions."""
+        self.terminal.config(state=tk.NORMAL)
+        self.terminal.delete("1.0", tk.END)
+
+        # Title
+        title = f"extracted data from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}@cutie-extractor\n\n"
+        self.terminal.insert(tk.END, title, "sh_header")
+
+        # Summary
+        summary = f"{len(activities)} Activities\n\n"
+        self.terminal.insert(tk.END, summary, "sh_header")
+
+        # Column descriptions (no sample rows, just headers with types)
+        headers_info = [
+            ("id", "integer"),
+            ("name", "string"),
+            ("distance", "float"),
+            ("moving_time", "float"),
+            ("elapsed_time", "integer"),
+            ("total_elevation_gain", "float"),
+            ("start_date", "date"),
+            ("average_speed", "float"),
+            ("max_speed", "float"),
+            ("average_temp", "integer"),
+            ("elev_high", "float"),
+            ("elev_low", "float"),
+            ("calories", "integer"),
+            ("pr_count", "integer"),
+        ]
+
+        for header, desc in headers_info:
+            # Insert header name in orange bold, then description
+            self.terminal.insert(tk.END, header, "sh_header")
+            self.terminal.insert(tk.END, f": {desc}\n", "sh_desc")
+
+        self.terminal.insert(tk.END, "\n")
+        
+        # Render choices (Export CSV / Back)
+        choices = ["Export CSV", "Back"]
+        for i, choice in enumerate(choices):
+            if i == self.preview_choice:
+                # Highlight selected choice
+                prefix = "►"
+                tag = "choice"
+            else:
+                prefix = " "
+                tag = "sh_desc"
+            line = f" {prefix} {choice}\n"
+            self.terminal.insert(tk.END, line, tag)
+
+        # Keep the view at the bottom (don't scroll up)
+        self.terminal.see(tk.END)
+        self.terminal.config(state=tk.DISABLED)
+
+    # ------------------ Preview & Export ------------------
+    def show_preview_window(self, activities, start_date, end_date):
+        """Show a 900x700 preview window with a summary, table and export button."""
+        if self.preview_win and tk.Toplevel.winfo_exists(self.preview_win):
+            try:
+                self.preview_win.lift()
+                return
+            except Exception:
+                pass
+
+        self.preview_win = tk.Toplevel(self.root)
+        self.preview_win.title("Preview - Activities")
+        self.preview_win.geometry("900x700")
+
+        header = ttk.Frame(self.preview_win)
+        header.pack(fill=tk.X, padx=10, pady=8)
+        ttk.Label(header, text=f"Preview: {len(activities)} activities from {start_date.date()} to {end_date.date()}", font=("Arial", 12, "bold")).pack(side=tk.LEFT)
+
+        export_btn = ttk.Button(header, text="Export to CSV", command=lambda: self.export_preview_csv(activities, start_date, end_date))
+        export_btn.pack(side=tk.RIGHT)
+
+        # Table area (scrolled text monospace)
+        txt = scrolledtext.ScrolledText(self.preview_win, font=("Courier New", 10), wrap=tk.NONE)
+        txt.pack(fill=tk.BOTH, expand=True, padx=10, pady=6)
+
+        # Prepare columns and rows
+        if not activities:
+            txt.insert(tk.END, "No activities found for the selected range.")
+            txt.config(state=tk.DISABLED)
+            return
+
+        # Use extractor to get ordered fields as in API order specified by user
+        headers = [
+            "id", "name", "distance", "moving_time", "elapsed_time",
+            "total_elevation_gain", "start_date", "average_speed", "max_speed",
+            "average_temp", "elev_high", "elev_low", "calories", "pr_count",
+        ]
+
+        # Build rows (show up to 15 rows)
+        rows = []
+        for activity in activities[:15]:
+            ex = self.extractor.extract_activity_data(activity)
+            row = [str(ex.get(h, "")) for h in headers]
+            rows.append(row)
+
+        # compute col widths
+        col_widths = [max(len(h), max((len(row[i]) for row in rows), default=0)) + 2 for i, h in enumerate(headers)]
+
+        # header line
+        header_line = " | ".join(h.ljust(col_widths[i]) for i, h in enumerate(headers))
+        txt.insert(tk.END, header_line + "\n")
+        txt.insert(tk.END, "-" * len(header_line) + "\n")
+
+        for r in rows:
+            line = " | ".join(r[i].ljust(col_widths[i]) for i in range(len(headers)))
+            txt.insert(tk.END, line + "\n")
+
+        txt.insert(tk.END, "\n")
+        txt.insert(tk.END, f"Showing {len(rows)} of {len(activities)} activities\n")
+        txt.config(state=tk.DISABLED)
+
+    def export_preview_csv(self, activities, start_date, end_date):
+        """Export previewed activities to Downloads CSV."""
+        if not activities:
             messagebox.showwarning("No Data", "No activities to export")
             return
 
-        try:
-            # Get Downloads folder
-            downloads_path = Path.home() / "Downloads"
+        downloads = Path.home() / "Downloads"
+        filename = f"strava_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.csv"
+        filepath = downloads / filename
 
-            # Generate filename
-            start_date = self.start_date_var.get().replace("-", "")
-            end_date = self.end_date_var.get().replace("-", "")
-            filename = f"strava_{start_date}_{end_date}.csv"
-            filepath = downloads_path / filename
-
-            # Export
-            if self.extractor.export_to_csv(self.activities, str(filepath)):
-                self.export_status_label.config(
-                    text=f"✅ Exported to {filepath}", foreground="green"
-                )
-                messagebox.showinfo(
-                    "Success", f"Data exported to:\n{filepath}"
-                )
-            else:
-                messagebox.showerror("Error", "Failed to export CSV")
-
-        except Exception as e:
-            messagebox.showerror("Error", f"Export failed: {str(e)}")
+        # write CSV using extractor
+        success = self.extractor.export_to_csv(activities, str(filepath))
+        if success:
+            messagebox.showinfo("Exported", f"Exported to {filepath}")
+        else:
+            messagebox.showerror("Error", "Failed to export CSV")
+    # Note: legacy date-widget methods and fetch/export handlers were removed.
+    # The terminal-style quick options use the handlers defined above
+    # (select_days, set_this_month, select_all_time, prompt_custom_days,
+    # fetch_and_preview, show_preview_window, export_preview_csv).
 
 
 def main():
