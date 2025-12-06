@@ -1,0 +1,13 @@
+# .gitignore file content
+
+# Python bytecode
+*.pyc
+
+# Virtual Environment folder (Optional, but good practice)
+.venv/
+venv/
+
+# Credentials and sensitive files
+.env
+config.py
+*secrets.json
