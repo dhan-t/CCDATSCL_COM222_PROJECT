@@ -263,7 +263,7 @@ class StravaGUI:
         self.root.minsize(600, 400)
         self.root.maxsize(600, 400)
         
-        # Render menu
+        # Render menu the
         self.render_menu()
 
         # Bind arrow keys and Enter

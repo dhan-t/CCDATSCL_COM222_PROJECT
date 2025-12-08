@@ -1,0 +1,5 @@
+id,name,distance,moving_time,elapsed_time,total_elevation_gain,start_date,average_speed,max_speed,average_temp,elev_high,elev_low,calories,pr_count,avg_hr,max_hr,min_hr
+16681158619,DS Long Ride,52.21,148.47,12608,388,2025-12-08T00:20:45Z,21.1,51.8,26,464,34,,0,147,181,78
+16671305028,DS TT TEST (W2),20.16,42.68,2588,21,2025-12-06T23:10:39Z,28.34,37.87,23,76,54,,0,164,184,103
+16666578386,DS 1x20 Puerto Climb (W2),6.16,34.3,2260,183,2025-12-04T08:05:08Z,10.78,51.84,27,185,30,,10,157,188,122
+16666578443,DS 3x3x4 Interval Morning Ride (W2),9.8,23.85,1431,11,2025-12-03T00:54:16Z,24.65,39.74,29,78,62,,0,159,190,113
