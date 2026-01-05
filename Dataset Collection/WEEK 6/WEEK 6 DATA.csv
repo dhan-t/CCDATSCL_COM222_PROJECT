@@ -1,0 +1,5 @@
+id,name,distance,moving_time,elapsed_time,total_elevation_gain,start_date,average_speed,max_speed,average_temp,elev_high,elev_low,calories,pr_count,avg_hr,max_hr,min_hr
+16931524448,DS TT TEST (W6) (too windy),20.16,45.33,2737,123,2026-01-04T05:24:38Z,26.68,45,33,84,62,,1,163,187,122
+16931524371,DS Free ride (W6),10.27,32.83,2074,22,2026-01-03T09:18:46Z,18.77,36.86,25,75,45,,0,,,
+16931504350,DS Zone 2 (W6),39.98,103.45,6300,214,2026-01-01T07:14:14Z,23.18,47.02,29,314,61,,0,139,184,85
+16931545141,DS INTERVAL (W6),12.3,28.03,1682,22,2025-12-31T01:44:03Z,26.32,39.74,28,77,64,,0,166,191,112
