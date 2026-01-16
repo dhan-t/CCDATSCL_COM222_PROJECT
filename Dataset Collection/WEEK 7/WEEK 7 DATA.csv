@@ -1,0 +1,4 @@
+id,name,distance,moving_time,elapsed_time,total_elevation_gain,start_date,average_speed,max_speed,average_temp,elev_high,elev_low,calories,pr_count,avg_hr,max_hr,min_hr
+17057713417,DS TT TEST (W7) PR!,20.12,39.93,2426,21,2026-01-13T00:01:40Z,30.22,36.79,25,75,59,,1,172,191,110
+17022377748,DS Zone 2 (W7),40.31,111.37,7642,261,2026-01-12T06:10:41Z,21.72,48.74,30,314,58,,0,145,176,98
+17010663878,DS INTERVAL (W7),10.63,24.6,1914,9,2026-01-11T00:46:56Z,25.92,40.54,28,72,59,,0,169,188,121
